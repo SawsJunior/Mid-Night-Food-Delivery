@@ -40,6 +40,21 @@ app.get('/webhook', (req, res) => {
 
 // Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
+    requestify.post(`https://graph.facebook.com/v5.0/me/messenger_profile?access_token=${pageaccesstoken}`, 
+        {
+          "get_started": {
+            "payload": "Hi"
+          },
+          "greeting": [
+            {
+              "locale":"default",
+              "text":"Hello {{user_first_name}}!" 
+            }, {
+              "locale":"en_US",
+              "text":"Timeless apparel for the masses."
+            }
+          ]
+        };
  
   let body = req.body;
 
