@@ -5,6 +5,7 @@ const
   express = require('express'),
   bodyParser = require('body-parser'),
   request = require('request'),
+  requestify = require('requestify'),
   app = express().use(bodyParser.json()), // creates express http server
   PAGE_ACCESS_TOKEN = 'EAAGmDbjwkJABAH37qZB8VfMKyfItDZCj7ZBgmUwfO6R8righR1v37j0JQ1ZBRqcOQ8owBmNsSX90kexg6pBWnJZAR121XS3pckH1IlgHRrWZBlveTKmU5eKPDaJC1rEVJ5DXetcNO1UrZCh3vedgbuyUudhZCpJ58qCVW5JMvGSDAk6wv96dEIqj';
 // Sets server port and logs message on success
@@ -40,21 +41,6 @@ app.get('/webhook', (req, res) => {
 
 // Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
-    request.post(`https://graph.facebook.com/v5.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, 
-        {
-          "get_started": {
-            "payload": "Hi"
-          },
-          "greeting": [
-            {
-              "locale":"default",
-              "text":"Hello {{user_first_name}}!" 
-            }, {
-              "locale":"en_US",
-              "text":"Timeless apparel for the masses."
-            }
-          ]
-        });
  
   let body = req.body;
 
@@ -77,12 +63,10 @@ app.post('/webhook', (req, res) => {
       // pass the event to the appropriate handler function
       if (webhook_event.message) {
         handleMessage(sender_psid, webhook_event.message);        
-      } else if (webhook_event.postback) {
-        
+      } 
+       if (webhook_event.postback) { 
         handlePostback(sender_psid, webhook_event.postback);
-      }
-
-      
+      }     
     });
 
     // Returns a '200 OK' response to all requests
@@ -92,6 +76,22 @@ app.post('/webhook', (req, res) => {
     res.sendStatus(404);
   }
 
+});
+
+requestify.post(`https://graph.facebook.com/v5.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, 
+{
+  "get_started": {
+    "payload": "Hi"
+  },
+  "greeting": [
+    {
+      "locale":"default",
+      "text":"Hello {{user_first_name}}!" 
+    }, {
+      "locale":"en_US",
+      "text":"Timeless apparel for the masses."
+    }
+  ]
 });
 
 
