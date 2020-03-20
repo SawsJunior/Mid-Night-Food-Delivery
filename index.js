@@ -78,66 +78,51 @@ app.post('/webhook', (req, res) => {
 
 });
 
-requestify.post(`https://graph.facebook.com/v5.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, 
-{
-  "get_started": {
-    "payload": "Hi"
-  },
-  "greeting": [
-    {
-      "locale":"default",
-      "text":"Hello {{user_first_name}}!" 
-    }, {
-      "locale":"en_US",
-      "text":"Timeless apparel for the masses."
+if(userInput == 'Hi'){
+  let welcomeMessage={
+    "recipient":{
+      "id":webhook_event.sender_psid
+    },
+    "message":{
+      "text":"Hi GGWP"
     }
-  ]
-});
-
-
-  function handleMessage(sender_psid, received_message) {
-    let response;
-    console.log ('hello', received_message)
-    // Checks if the message contains text
-    if (received_message.text) {    
-      // Create the payload for a basic text message, which
-      // will be added to the body of our request to the Send API
-      response = {
-        "text": `You sent the message: "${received_message.text}". Now send me an attachment!`
-      }
-    } else if (received_message.attachments) {
-      // Get the URL of the message attachment
-      let attachment_url = received_message.attachments[0].payload.url;
-      response = {
-        "attachment": {
-          "type": "template",
-          "payload": {
-            "template_type": "generic",
-            "elements": [{
-              "title": "Is this the right picture?",
-              "subtitle": "Tap a button to answer.",
-              "image_url": attachment_url,
-              "buttons": [
-                {
-                  "type": "postback",
-                  "title": "Yes!",
-                  "payload": "yes",
-                },
-                {
-                  "type": "postback",
-                  "title": "No!",
-                  "payload": "no",
-                }
-              ],
-            }]
-          }
-        }
-      }
-    } 
-    
-    // Send the response message
-    callSendAPI(sender_psid, response);    
   }
+  let genericMessage={
+    "recipient":{
+      "id":webhook_event.sender_psid
+  },
+  "message":{
+    "attachment":{
+      "type":"template",
+      "payload":{
+        "template_type":"generic",
+        "element":[
+          {
+            "title":"Test",
+            "buttons":[
+              {
+                "type":"postback",
+                "title":"buy",
+                "payload":"b1"
+              }
+            ]
+
+          }
+        ]
+      }
+    }
+  }
+}
+requestify.post('https://graph.facebook.com/v5.0/me/message?access_token=EAAGmDbjwkJABAH37qZB8VfMKyfItDZCj7ZBgmUwfO6R8righR1v37j0JQ1ZBRqcOQ8owBmNsSX90kexg6pBWnJZAR121XS3pckH1IlgHRrWZBlveTKmU5eKPDaJC1rEVJ5DXetcNO1UrZCh3vedgbuyUudhZCpJ58qCVW5JMvGSDAk6wv96dEIqj',
+genericMessage
+).then(response=>{
+  console.log(response)
+}).fail(error=>{
+  console.log(error)
+})
+}
+
+
   
   function handlePostback(sender_psid, received_postback) {
     console.log('ok')
@@ -163,7 +148,7 @@ requestify.post(`https://graph.facebook.com/v5.0/me/messenger_profile?access_tok
       },
       "message": response
     }
-  
+
     // Send the HTTP request to the Messenger Platform
     request({
       "uri": "https://graph.facebook.com/v5.0/me/messages",
